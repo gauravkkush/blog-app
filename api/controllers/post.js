@@ -14,7 +14,7 @@ export const getPosts = (req, res) => {
 };
 export const getPost = (req, res) => {
 	const q =
-		"Select `username`,`title`,`desc`,p.img, u.img as userImg,`cat`,`date` from users u Join posts p on u.id=p.id where p.id=?";
+		"Select p.id,`username`,`title`,`desc`,p.img, u.img as userImg,`cat`,`date` from users u Join posts p on u.id=p.uid where p.id=?";
 
 	db.query(q, [req.params.id], (err, data) => {
 		if (err) return res.status(500).json(err);
@@ -22,9 +22,12 @@ export const getPost = (req, res) => {
 		return res.status(200).json(data[0]);
 	});
 };
+
 export const addPost = (req, res) => {
 	res.json("from controller");
 };
+
+//delete the post
 export const deletePost = (req, res) => {
 	const token = req.cookies.access_token;
 

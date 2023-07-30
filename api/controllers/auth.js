@@ -9,7 +9,21 @@ export const register = (req, res) => {
 	db.query(q, [req.body.email, req.body.username], (err, data) => {
 		if (err) return res.json(err);
 
-		if (data.length) return res.status(409).json("User already exists");
+		// Check if email or username already exists in the database
+		if (data.length > 0) {
+			const existingEmail = data.some((user) => user.email === req.body.email);
+			const existingUsername = data.some(
+				(user) => user.username === req.body.username
+			);
+
+			if (existingEmail && existingUsername) {
+				return res.status(409).json("Email and username already exist");
+			} else if (existingEmail) {
+				return res.status(409).json("Email already exists");
+			} else if (existingUsername) {
+				return res.status(409).json("Username already exists" );
+			}
+		}
 
 		//password hashing
 		const salt = bcrypt.genSaltSync(10);
@@ -36,7 +50,6 @@ export const login = (req, res) => {
 		if (data.length === 0) return res.status(404).json("User not found!");
 
 		//check password
-
 		const isPasswordCorrect = bcrypt.compareSync(
 			req.body.password,
 			data[0].password
