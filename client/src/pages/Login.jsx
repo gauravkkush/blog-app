@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
-
+import Logo from "../img/logoh.png";
 const Login = () => {
 	const [inputs, setInputs] = useState({
 		username: "",
@@ -29,8 +29,10 @@ const Login = () => {
 
 	return (
 		<div className="auth">
-			<h1>Login</h1>
 			<form>
+				<div className="logo">
+					<img src={Logo} alt="" />
+				</div>
 				<input
 					type="text"
 					name="username"

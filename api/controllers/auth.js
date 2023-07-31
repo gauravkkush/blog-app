@@ -21,7 +21,7 @@ export const register = (req, res) => {
 			} else if (existingEmail) {
 				return res.status(409).json("Email already exists");
 			} else if (existingUsername) {
-				return res.status(409).json("Username already exists" );
+				return res.status(409).json("Username already exists");
 			}
 		}
 
@@ -57,12 +57,14 @@ export const login = (req, res) => {
 		if (!isPasswordCorrect)
 			return res.status(400).json("Wrong username or password!");
 
-		const token = jwt.sign({ id: data[0].id }, "jwtkey ");
+		const token = jwt.sign({ id: data[0].id }, "jwtkey");
 		const { password, ...other } = data[0];
 
 		res
 			.cookie("access_token", token, {
 				httpOnly: true,
+				secure: false,
+				sameSite: "none",
 			})
 			.status(200)
 			.json(other);

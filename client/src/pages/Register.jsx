@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Logo from "../img/logoh.png";
 
 const Register = () => {
 	const [inputs, setInputs] = useState({
@@ -18,10 +19,7 @@ const Register = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			await axios.post(
-				"http://localhost:8800/api/auth/register",
-				inputs
-			);
+			await axios.post("http://localhost:8800/api/auth/register", inputs);
 			navigate("/login");
 		} catch (err) {
 			setError(err.response.data);
@@ -30,8 +28,10 @@ const Register = () => {
 
 	return (
 		<div className="auth">
-			<h1>Register</h1>
 			<form>
+				<div className="logo">
+					<img src={Logo} alt="" />
+				</div>
 				<input
 					type="email"
 					placeholder="Email"

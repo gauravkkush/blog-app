@@ -1,15 +1,15 @@
-import React from 'react'
-import {Link} from 'react-router-dom'
-import Logo from "../img/logo.webp"
+import React from "react";
+import Logo from "../img/logo.png";
 
 const Footer = () => {
-  return (
-    <footer>
-      <img src={Logo} alt="" />
-      <span>Made with &hearts; and <b>React.js</b>.
-      </span>
-    </footer>
-  )
-}
+	return (
+		<footer>
+			<img src={Logo} alt="" />
+			<span>
+				Made with &hearts; and <b>React.js</b>.
+			</span>
+		</footer>
+	);
+};
 
-export default Footer
+export default Footer;
