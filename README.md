@@ -39,8 +39,8 @@ My Blog App is a web application that allows users to read, write, and publish b
 1. Clone the repository:
 
 ```
-git clone https://github.com/your-username/my-blog-app.git
-cd my-blog-app
+git clone https://github.com/your-username/blog-app.git
+cd blog-app
 ```
 
 2. Install frontend and backend dependencies:
