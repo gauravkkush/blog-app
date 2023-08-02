@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 	},
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage, limits: 1024 });
 
 app.post("/api/upload", upload.single("file"), function (req, res) {
 	const file = req.file;

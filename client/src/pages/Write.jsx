@@ -7,18 +7,18 @@ import moment from "moment";
 
 const Write = () => {
 	const state = useLocation().state;
-	const [value, setValue] = useState(state?.title || "");
-	const [title, setTitle] = useState(state?.desc || "");
+	const [value, setValue] = useState(state?.desc || "");
+	const [title, setTitle] = useState(state?.title || "");
 	const [file, setFile] = useState(null);
 	const [cat, setCat] = useState(state?.cat || "");
 
 	const navigate = useNavigate();
-	
+
 	const uploadImage = async () => {
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
-			const res = await axios.post("/upload", formData);
+			const res = await axios.post("/upload", formData, { timeout: 30000 });
 			return res.data;
 		} catch (err) {
 			console.log(err);
@@ -34,8 +34,8 @@ const Write = () => {
 				? await axios.put(`/posts/${state.id}`, {
 						title,
 						desc: value,
-						cat,
 						img: file ? imgUrl : "",
+						cat,
 				  })
 				: await axios.post(`/posts/`, {
 						title,
@@ -57,7 +57,7 @@ const Write = () => {
 					type="text"
 					value={title}
 					placeholder="Title"
-					onChange={(e) => setTitle(e.target.value)}
+					onChange={(e) => setTitle(e.target.title)}
 				/>
 
 				<div className="editorContainer">
@@ -85,9 +85,12 @@ const Write = () => {
 						name="file"
 						onChange={(e) => setFile(e.target.files[0])}
 					/>
-					<label className="file" htmlFor="file">
-						Upload Image
-					</label>
+					<div className="imageInput">
+						<label className="file" htmlFor="file">
+							<span>Upload Image</span>
+						</label>
+						<p className="warning">Max Size: 1024KB</p>
+					</div>
 					<div className="buttons">
 						<button>Save as a draft</button>
 						<button onClick={handleClick}>Publish</button>
