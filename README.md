@@ -39,7 +39,7 @@ My Blog App is a web application that allows users to read, write, and publish b
 1. Clone the repository:
 
 ```
-git clone https://github.com/your-username/blog-app.git
+git clone https://github.com/gauravkkush/blog-app.git
 cd blog-app
 ```
 
