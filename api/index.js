@@ -9,7 +9,7 @@ import multer from "multer";
 const app = express();
 
 // Enable CORS for all routes
-const frontendDomain = "http://localhost:3000";
+const frontendDomain = process.env.FRONTEND_URL;
 const corsOptions = {
 	origin: frontendDomain,
 	credentials: true, // Allows cookies to be sent with the request
@@ -41,6 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 
-app.listen(8800, () => {
-	console.log("Server is Connected...");
+const PORT = process.env.PORT || 8800;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
