@@ -9,42 +9,33 @@ const Write = () => {
 	const state = useLocation().state;
 	const [value, setValue] = useState(state?.desc || "");
 	const [title, setTitle] = useState(state?.title || "");
-	const [file, setFile] = useState(null);
+	const [files, setFiles] = useState([]);
 	const [cat, setCat] = useState(state?.cat || "");
+	const [tags, setTags] = useState(state?.tags || "");
+	const [contentMode, setContentMode] = useState(
+		state?.content_mode || "document",
+	);
 
 	const navigate = useNavigate();
 
-	const uploadImage = async () => {
-		try {
-			const formData = new FormData();
-			formData.append("file", file);
-			const res = await axios.post("/upload", formData, { timeout: 30000 });
-			return res.data;
-		} catch (err) {
-			console.log(err);
-		}
-	};
-
-	const handleClick = async (e) => {
+	const handleClick = async (e, status = "published") => {
 		e.preventDefault();
-		const imgUrl = await uploadImage();
+		const formData = new FormData();
+		formData.append("title", title);
+		formData.append("desc", value);
+		formData.append("cat", cat);
+		formData.append("tags", tags);
+		formData.append("content_mode", contentMode);
+		formData.append("status", status);
+		if (!state)
+			formData.append("date", moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"));
+		files.forEach((selectedFile) => formData.append("media", selectedFile));
 
 		try {
 			state
-				? await axios.put(`/posts/${state.id}`, {
-						title,
-						desc: value,
-						img: file ? imgUrl : "",
-						cat,
-				  })
-				: await axios.post(`/posts/`, {
-						title,
-						desc: value,
-						cat,
-						img: file ? imgUrl : "",
-						date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
-				  });
-			navigate("/");
+				? await axios.put(`/posts/${state.id}`, formData, { timeout: 30000 })
+				: await axios.post(`/posts/`, formData, { timeout: 30000 });
+			navigate(status === "draft" ? "/profile" : "/");
 		} catch (err) {
 			console.log(err);
 		}
@@ -57,17 +48,46 @@ const Write = () => {
 					type="text"
 					value={title}
 					placeholder="Title"
-					onChange={(e) => setTitle(e.target.title)}
+					onChange={(e) => setTitle(e.target.value)}
 				/>
 
-				<div className="editorContainer">
-					<ReactQuill
-						className="editor"
-						theme="snow"
-						value={value}
-						onChange={setValue}
-					/>
+				<div className="editor-mode" role="group" aria-label="Content mode">
+					<button
+						type="button"
+						className={contentMode === "document" ? "active" : ""}
+						onClick={() => setContentMode("document")}
+					>
+						Document
+					</button>
+					<button
+						type="button"
+						className={contentMode === "html" ? "active" : ""}
+						onClick={() => setContentMode("html")}
+					>
+						HTML
+					</button>
 				</div>
+				{contentMode === "document" ? (
+					<div className="editorContainer">
+						<ReactQuill
+							className="editor"
+							theme="snow"
+							value={value}
+							onChange={setValue}
+						/>
+					</div>
+				) : (
+					<textarea
+						className="html-editor"
+						value={value}
+						onChange={(event) => setValue(event.target.value)}
+						spellCheck="false"
+						placeholder={
+							'<h2>Your heading</h2>\n<p>Write HTML content here...</p>\n<img data-media-index="0" alt="" />'
+						}
+						aria-label="HTML content"
+					/>
+				)}
 			</div>
 			<div className="menu">
 				<div className="item">
@@ -83,18 +103,36 @@ const Write = () => {
 						type="file"
 						id="file"
 						name="file"
-						onChange={(e) => setFile(e.target.files[0])}
+						multiple
+						accept="image/*"
+						onChange={(e) => setFiles(Array.from(e.target.files).slice(0, 10))}
 					/>
 					<div className="imageInput">
 						<label className="file" htmlFor="file">
-							<span>Upload Image</span>
+							<span>Upload up to 10 images</span>
 						</label>
-						<p className="warning">Max Size: 1024KB</p>
+						<p className="warning">
+							Each image: 1024KB max. {files.length}/10 selected.
+						</p>
 					</div>
 					<div className="buttons">
-						<button>Save as a draft</button>
-						<button onClick={handleClick}>Publish</button>
+						<button onClick={(e) => handleClick(e, "draft")}>
+							Save as draft
+						</button>
+						<button onClick={(e) => handleClick(e, "published")}>
+							Publish
+						</button>
 					</div>
+				</div>
+				<div className="item">
+					<h1>Tags</h1>
+					<input
+						className="tag-input"
+						value={tags}
+						onChange={(e) => setTags(e.target.value)}
+						placeholder="e.g. react, frontend, tutorial"
+					/>
+					<p className="hint">Separate tags with commas.</p>
 				</div>
 				<div className="item">
 					<h1>Category</h1>

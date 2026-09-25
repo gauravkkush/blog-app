@@ -1,108 +1,183 @@
-# My Blog App
+# Blog App
 
-![Project Demo](demo.gif)
+A full-stack blog application built with React on the frontend and Express + MySQL on the backend. Users can register, sign in, create and edit posts, upload image media, like content, comment on posts, and manage a personal trash area for deleted articles.
 
-## Table of Contents
+## Overview
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+This project is split into two main parts:
 
-## Introduction
+- `client/`: React frontend with routing, protected pages, and blog UI
+- `api/`: Express API with authentication, database access, post management, and media handling
 
-My Blog App is a web application that allows users to read, write, and publish blog posts on various topics. Users can register and log in to create and manage their blog posts. The app also provides a user-friendly text editor to compose blog content with ease.
+## Tech Stack
+
+- Frontend: React, React Router, SCSS
+- Backend: Node.js, Express
+- Database: MySQL
+- Auth: JWT + cookies
+- File uploads: Multer
+- Rich content: React Quill
+- Other: CORS, dotenv, sanitize-html
 
 ## Features
 
-- User Authentication: Users can create an account, log in, and log out securely.
-- Create and Edit Blog Posts: Users can write and edit their blog posts using a rich text editor.
-- Categorization: Blog posts can be categorized into different topics (e.g., Art, Science, Technology, Cinema, Design, Food).
-- Image Upload: Users can upload images to use in their blog posts.
-- Publish and Drafts: Users can save blog posts as drafts or publish them for public visibility.
-- Responsive Design: The app is fully responsive and works well on various devices.
+- User registration and login
+- Protected routes for authenticated users
+- Post creation, editing, and deletion
+- Draft and published post states
+- Category and search filtering on public posts
+- Image upload support for posts
+- Likes and comments on posts
+- Notification feed for user activity
+- Trash view for soft-deleted posts
+- Responsive blog layout
 
-## Technologies Used
+## Project Structure
 
-- Frontend: React, React Quill (text editor), Axios
-- Backend: Node.js, Express.js, MongoDB
-- Authentication: JWT (JSON Web Tokens)
-- File Upload: Multer
-- Other: Moment.js, CORS, Cookie Parser
+```text
+blog-app/
+├── api/
+│   ├── controllers/
+│   ├── routes/
+│   ├── db.js
+│   ├── index.js
+│   ├── package.json
+│   ├── schema.sql
+│   └── .env (local, not committed)
+├── client/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── build/
+├── .nvmrc
+├── package-lock.json
+└── README.md
+```
+
+## Prerequisites
+
+Before running the app, make sure you have:
+
+- Node.js 20+
+- npm
+- MySQL database
+
+## Database Setup
+
+1. Create a MySQL database for the app.
+2. Import the schema file:
+
+```bash
+mysql -u your_user -p your_database < api/schema.sql
+```
+
+The schema automatically creates the required tables for users, posts, comments, likes, notifications, and post media.
+
+## Environment Configuration
+
+Create a `.env` file inside the `api` folder:
+
+```env
+PORT=8800
+FRONTEND_URL=http://localhost:3000
+JWT_SECRET=your_super_secret_key_here
+
+# Option 1: use a full DATABASE_URL
+DATABASE_URL=mysql://username:password@host:3306/database_name
+DB_SSL=false
+
+# Optional alternative config if you prefer explicit values
+# MYSQL_HOST=localhost
+# MYSQL_USER=root
+# MYSQL_PASSWORD=your_password
+# MYSQL_DATABASE=blogapp
+# MYSQL_PORT=3306
+```
+
+Notes:
+
+- The backend accepts either `DATABASE_URL` or individual `MYSQL_*` variables.
+- If your database requires TLS, set `DB_SSL=true`.
+- `FRONTEND_URL` should match the frontend origin used by the React app.
 
 ## Installation
 
-1. Clone the repository:
+From the project root:
 
-```
-git clone https://github.com/gauravkkush/blog-app.git
-cd blog-app
-```
-
-2. Install frontend and backend dependencies:
-
-```
-cd client
-npm install
-cd ../server
-npm install
+```bash
+cd api && npm install
+cd ../client && npm install
 ```
 
-3. Set up the environment variables:
+## Running the App
 
-Create a `.env` file in the `server` directory and set the following variables:
+Start the backend API in one terminal:
 
+```bash
+cd api
+npm run dev
 ```
-PORT=8800
-SECRET_KEY=your-secret-key-for-jwt
-```
 
-4. Run the application:
+Start the frontend in another terminal:
 
-```
+```bash
 cd client
 npm start
-cd ../server
-npm start
 ```
 
-## Usage
+The app will generally be available at:
 
-1. Open the app in your web browser by navigating to `http://localhost:3000`.
+- Frontend: http://localhost:3000
+- API: http://localhost:8800
 
-2. If you are a new user, click on "Register" to create an account. If you already have an account, click on "Login."
+## Default API Behavior
 
-3. Once logged in, you will be redirected to the dashboard where you can create new blog posts, view your drafts, or publish existing posts.
+The frontend is configured with this proxy setting:
 
-4. To create a new blog post, click on "New Post," enter the title, select the category, and start writing your content using the provided text editor. You can also upload images to include in your post.
+```json
+"proxy": "http://localhost:8800/api/"
+```
 
-5. After writing the post, you can either save it as a draft or click on "Publish" to make it visible to the public.
+That means the client can make requests such as `/api/posts` without manually specifying the backend host during development.
 
-6. To edit an existing post, click on the "Edit" button next to the respective post on the dashboard.
+## Core API Endpoints
 
-7. To log out, click on your username in the navigation bar and select "Logout."
+### Authentication
 
-## API Endpoints
+- `POST /api/auth/register` - register a new user
+- `POST /api/auth/login` - log in a user
+- `GET /api/auth/logout` - log out the current user
 
-The backend server provides the following API endpoints:
+### Posts
 
-- `POST /api/auth/register`: Register a new user.
-- `POST /api/auth/login`: Log in an existing user.
-- `GET /api/auth/logout`: Log out the currently logged-in user.
-- `POST /api/upload`: Upload an image file.
-- `POST /api/posts/`: Create a new blog post.
-- `GET /api/posts/`: Get all published blog posts.
-- `GET /api/posts/:id`: Get a specific blog post by ID.
-- `PUT /api/posts/:id`: Update an existing blog post by ID.
+- `GET /api/posts` - fetch published posts
+- `GET /api/posts/:id` - fetch a single post
+- `POST /api/posts` - create a post
+- `PUT /api/posts/:id` - update a post
+- `DELETE /api/posts/:id` - move a post to trash
+- `GET /api/posts/trash` - view trashed posts
+- `PUT /api/posts/trash/:id/restore` - restore a trashed post
+- `DELETE /api/posts/trash/:id` - permanently delete a post
 
-## Contributing
+### Engagement
 
-Contributions to this project are welcome! If you find any bugs or have suggestions for improvements, please open an issue or submit a pull request.
+- `GET /api/posts/:id/comments` - fetch comments
+- `POST /api/posts/:id/comments` - add a comment
+- `DELETE /api/posts/:id/comments/:commentId` - delete a comment
+- `POST /api/posts/:id/like` - toggle a like
+- `GET /api/posts/:id/engagement` - fetch like and engagement data
+
+### Media
+
+- `GET /api/posts/media/:mediaId` - fetch post media by ID
+
+## Common Development Notes
+
+- The API uses cookie-based JWT authentication.
+- Uploaded post media is stored in MySQL as binary data.
+- The app uses a MySQL schema initializer on startup via `api/db.js`.
+- The frontend and backend are designed to run together in development mode, with the client proxying API requests to the backend.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute the code for personal and commercial projects. 
+This project is for learning and local development. Add a license file if you plan to distribute or reuse it publicly.

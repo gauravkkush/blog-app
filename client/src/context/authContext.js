@@ -4,21 +4,20 @@ import axios from "axios";
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-	const [currentUser, setCurrentUser] = useState(
-		JSON.parse(localStorage.getItem("user") || null)
-	);
+	const [currentUser, setCurrentUser] = useState(() => {
+		const storedUser = localStorage.getItem("user");
+		return storedUser ? JSON.parse(storedUser) : null;
+	});
 
 	const login = async (inputs) => {
-		const res = await axios.post(
-			"/auth/login",
-			inputs,
-			{ withCredentials: true }
-		);
+		const res = await axios.post("/auth/login", inputs, {
+			withCredentials: true,
+		});
 		setCurrentUser(res.data);
 	};
 
-	const logout = async (inputs) => {
-		await axios.post("/auth/logout");
+	const logout = async () => {
+		await axios.post("/auth/logout", {}, { withCredentials: true });
 		setCurrentUser(null);
 	};
 

@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Logo from "../img/logoh.png";
-import dotenv from "dotenv";
-dotenv.config();
-const api= process.env.REACT_APP_API_URL;
+
+// Create React App exposes REACT_APP_* variables at build time; dotenv belongs
+// only in Node.js code. An empty base keeps local requests compatible with the
+// development proxy configured in package.json.
+const api = process.env.REACT_APP_API_URL || "";
 const Register = () => {
 	const [inputs, setInputs] = useState({
 		username: "",

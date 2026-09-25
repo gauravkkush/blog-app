@@ -22,7 +22,16 @@ const Menu = ({ category }) => {
 			<h1>Other posts you may like</h1>
 			{posts.map((post) => (
 				<div className="post" key={post.id}>
-					<img src={`/upload/${post?.img}`} alt="" />
+					{(post.media_id || post.img) && (
+						<img
+							src={
+								post.media_id
+									? `/posts/media/${post.media_id}`
+									: `/upload/${post.img}`
+							}
+							alt=""
+						/>
+					)}
 					<h2>{post.title}</h2>
 					<Link to={`/post/${post.id}`}>
 						<button>Read More</button>
